@@ -1,22 +1,12 @@
 // Service Worker for MySchedul PWA
-const CACHE_NAME = 'myschedul-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-];
+const CACHE_NAME = 'myschedul-v2';
 
-// Install - cache static assets
+// Install - skip waiting
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
   self.skipWaiting();
 });
 
-// Activate - clean old caches
+// Activate - clean old caches and claim clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -31,13 +21,32 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch - network first, fallback to cache
+// For navigation requests, always return index.html
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
   // Skip API calls and external resources
   if (!event.request.url.startsWith(self.location.origin)) return;
+  
+  // Skip Firebase requests
+  if (event.request.url.includes('firestore.googleapis.com')) return;
+  if (event.request.url.includes('firebase')) return;
 
+  const url = new URL(event.request.url);
+  
+  // For navigation requests (HTML pages), return the app shell
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          return caches.match('./index.html');
+        })
+    );
+    return;
+  }
+
+  // For other requests, try network first, then cache
   event.respondWith(
     fetch(event.request)
       .then((response) => {
@@ -52,9 +61,7 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(() => {
         // Fallback to cache when offline
-        return caches.match(event.request).then((cachedResponse) => {
-          return cachedResponse || caches.match('/');
-        });
+        return caches.match(event.request);
       })
   );
 });
