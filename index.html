@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#a5b4fc" />
+    <meta name="description" content="나만의 일정 관리 앱 - 타임라인, To-do, 목표 관리" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MySchedul" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json" />
+    
+    <title>MySchedul - 나만의 일정 관리</title>
+    <script type="module" crossorigin src="./assets/index-BGB9UVMa.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-C11G6krc.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((reg) => console.log('SW registered:', reg.scope))
+            .catch((err) => console.log('SW registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>
