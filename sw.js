@@ -1,9 +1,16 @@
 // Service Worker for MySchedul PWA
-const CACHE_NAME = 'myschedul-v4';
+const CACHE_NAME = 'myschedul-v5';
 
 // Install - skip waiting
 self.addEventListener('install', (event) => {
   self.skipWaiting();
+});
+
+// Listen for skip waiting message
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Activate - clean old caches and claim clients

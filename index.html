@@ -33,7 +33,7 @@
         }
       }(window.location))
     </script>
-    <script type="module" crossorigin src="/sfcohresdauyl_brighten/assets/index-B9IkI6ib.js"></script>
+    <script type="module" crossorigin src="/sfcohresdauyl_brighten/assets/index-BTNrkJRZ.js"></script>
     <link rel="modulepreload" crossorigin href="/sfcohresdauyl_brighten/assets/vendor-react-D3IbNI4r.js">
     <link rel="modulepreload" crossorigin href="/sfcohresdauyl_brighten/assets/vendor-firebase-DQHywSXL.js">
     <link rel="stylesheet" crossorigin href="/sfcohresdauyl_brighten/assets/index-C9yqJQst.css">
@@ -45,9 +45,32 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then((reg) => console.log('SW registered:', reg.scope))
+          navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+            .then((reg) => {
+              console.log('SW registered:', reg.scope);
+              // 새 버전 있으면 즉시 활성화
+              reg.update();
+              if (reg.waiting) {
+                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+              }
+              reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      newWorker.postMessage({ type: 'SKIP_WAITING' });
+                      window.location.reload();
+                    }
+                  });
+                }
+              });
+            })
             .catch((err) => console.log('SW registration failed:', err));
+        });
+        
+        // Controller 변경 시 새로고침
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
         });
       }
     </script>
