@@ -1,5 +1,5 @@
 // Service Worker for MySchedul PWA
-const CACHE_NAME = 'myschedul-v13';
+const CACHE_NAME = 'myschedul-v14';
 
 // Install - skip waiting
 self.addEventListener('install', (event) => {
